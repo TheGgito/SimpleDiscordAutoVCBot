@@ -25,12 +25,12 @@ Just simply create a voice channel that has the text "create" in it and your don
    ```bash
    git clone https://github.com/TheGgito/SimpleDiscordAutoVCBot.git
    cd SimpleDiscordAutoVCBot
-2. Install npm
+2. Install npm:
    ```bash 
    npm install
 3. DISCORD_BOT_TOKEN=your-bot-token-here
    
-4. Start the bot.
+4. Start the bot:
 - Just start the `start-bot.exe` if u are on windows OR on linux `start-bot.sh`.
    ```bash
    node bot-start.js
@@ -38,7 +38,7 @@ Just simply create a voice channel that has the text "create" in it and your don
 ## Questions?
 Add me on Discord @gigto
 
-## Wanna have a even simpler way? Add my bot ^^
+## Wanna have a even simpler way? Add my bot to your server. Totally for free and u get a music function as well ;).
 [Invite my Bot](https://discord.com/oauth2/authorize?client_id=1200573679738830868&permissions=277083450689&scope=bot%20applications.commands)
 
 ## License
