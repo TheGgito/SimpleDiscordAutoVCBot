@@ -39,9 +39,9 @@ client.once('ready', async () => {
           const tempChannel = await createTempChannel(createChannel, member, Server);
           if (member.voice.channel) {
             await member.voice.setChannel(tempChannel).catch((error) => {
-              console.error(`${getTimestamp()} ! [ERROR] Error while moving member to Temp channel in Server ${Server.name}:`, error);
+              console.error(`${getTimestamp()} ! [ERROR] Error while moving member to Temp channel | ${Server.name}:`, error);
             });
-            console.log(`${getTimestamp()} ~ [MOVE] ${member.user.tag} was moved to the "Temp" channel from "${createChannel.name}" in Server ${Server.name}`);
+            console.log(`${getTimestamp()} ~ [MOVE] ${member.user.tag} was moved to the "Temp" channel from "${createChannel.name}" | ${Server.name}`);
           }
 
           monitorTempChannel(tempChannel, Server);
@@ -57,12 +57,12 @@ client.once('ready', async () => {
     tempChannels.forEach(async (tempChannel) => {
       const fetchedChannel = await tempChannel.fetch().catch(console.error);
       if (fetchedChannel) {
-        console.log(`${getTimestamp()} * [INFO] Checking "Temp" channel: ${tempChannel.name} in Server ${Server.name}`);
-        console.log(`${getTimestamp()} * [INFO] Members in Temp channel: ${fetchedChannel.members.size}`);
+        console.log(`${getTimestamp()} * [INFO] Checking "Temp" channel | ${Server.name}`);
+        console.log(`${getTimestamp()} * [INFO] Members in Temp channel: ${fetchedChannel.members.size} | ${Server.name}`);
 
         if (fetchedChannel.members.size === 0) {
           await fetchedChannel.delete().catch(console.error);
-          console.log(`${getTimestamp()} - [DELETE] Deleted empty Temp channel: ${tempChannel.id} in Server ${Server.name}`);
+          console.log(`${getTimestamp()} - [DELETE] Deleted empty Temp channel: ${tempChannel.id} | ${Server.name}`);
         } else {
           monitorTempChannel(fetchedChannel, Server);
         }
@@ -77,7 +77,7 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
     const Server = newState.guild;
 
     if (createChannel && createChannel.name.toLowerCase().includes('create')) {
-      console.log(`${getTimestamp()} * [INFO] User ${newState.member.user.tag} joined "Create" channel in Server ${Server.name}`);
+      console.log(`${getTimestamp()} * [INFO] User ${newState.member.user.tag} joined "Create" channel | ${Server.name}`);
 
       if (
         newState.member.voice.channel &&
@@ -86,21 +86,21 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
         const tempChannel = await createTempChannel(createChannel, newState.member, Server);
         if (newState.member.voice.channel) {
           await newState.member.voice.setChannel(tempChannel).catch((error) => {
-            console.error(`${getTimestamp()} ! [ERROR] Error while moving member to Temp channel in Server ${Server.name}:`, error);
+            console.error(`${getTimestamp()} ! [ERROR] Error while moving member to Temp channel | ${Server.name}:`, error);
           });
-          console.log(`${getTimestamp()} ~ [MOVE] ${newState.member.user.tag} was moved to the "Temp" channel from "${createChannel.name}" in Server ${Server.name}`);
+          console.log(`${getTimestamp()} ~ [MOVE] ${newState.member.user.tag} was moved to the "Temp" channel from "${createChannel.name}" | ${Server.name}`);
         }
 
         monitorTempChannel(tempChannel, Server);
       }
     }
   } catch (error) {
-    console.error(`${getTimestamp()} ! [ERROR] Error in voiceStateUpdate handler in Server ${Server.name}:`, error);
+    console.error(`${getTimestamp()} ! [ERROR] Error in voiceStateUpdate handler | ${Server.name}:`, error);
   }
 });
 
 const createTempChannel = async (createChannel, member, Server) => {
-  console.log(`${getTimestamp()} + [CREATE] Creating Temp channel for member ${member.user.tag} in ${createChannel.name} in Server ${Server.name}`);
+  console.log(`${getTimestamp()} + [CREATE] Creating Temp channel for member ${member.user.tag} in ${createChannel.name} | ${Server.name}`);
   const tempChannel = await Server.channels.create({
     name: 'Temp',
     type: ChannelType.GuildVoice,
@@ -124,16 +124,16 @@ const monitorTempChannel = (tempChannel, Server) => {
     try {
       const channel = await tempChannel.fetch().catch(console.error);
       if (channel) {
-        console.log(`${getTimestamp()} * [INFO] Checking Temp channel: ${channel.name} in Server ${Server.name}`);
+        console.log(`${getTimestamp()} * [INFO] Checking Temp channel: ${channel.name} | ${Server.name}`);
         console.log(`${getTimestamp()} * [INFO] Members in Temp channel: ${channel.members.size}`);
         
         if (channel.members.size === 0) {
           await channel.delete().catch(console.error);
-          console.log(`${getTimestamp()} - [DELETE] Deleted empty Temp channel: ${tempChannel.id} in Server ${Server.name}`);
+          console.log(`${getTimestamp()} - [DELETE] Deleted empty Temp channel: ${tempChannel.id} | ${Server.name}`);
         }
       }
     } catch (error) {
-      console.error(`${getTimestamp()} ! [ERROR] Error while checking and deleting temp channel in Server ${Server.name}:`, error);
+      console.error(`${getTimestamp()} ! [ERROR] Error while checking and deleting temp channel | ${Server.name}:`, error);
     }
   };
 
@@ -141,7 +141,7 @@ const monitorTempChannel = (tempChannel, Server) => {
     if (oldState.channelId === tempChannel.id || newState.channelId === tempChannel.id) {
       checkChannelEmpty();
       if (newState.channelId === null) {
-        console.log(`${getTimestamp()} * [INFO] ${newState.member.user.tag} left the "Temp" channel in Server ${Server.name}`);
+        console.log(`${getTimestamp()} * [INFO] ${newState.member.user.tag} left the "Temp" channel | ${Server.name}`);
       }
     }
   });
