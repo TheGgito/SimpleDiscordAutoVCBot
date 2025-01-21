@@ -1,6 +1,9 @@
 # Simple Discord Auto VC Bot
 
-This is a Discord bot designed to manage temporary voice channels on a server. It automatically creates a "Temp" voice channel when a user joins a "Create" channel and moves them to the newly created channel. It also deletes empty "Temp" channels after users leave. This bot is useful for managing temporary voice chats on Discord.
+This is a Discord bot designed to easily and fast create temporary voice channals for your discord server.
+
+## How it works!
+Just simply create a voice channal that hast the text "create" in it and your done. Example: "Create-GermanVC", "Englisch-Create", ....
 
 ## Features
 
