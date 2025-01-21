@@ -3,7 +3,7 @@
 This is a Discord bot designed to easily and fast create temporary voice channals for your discord server.
 
 ## How it works!
-Just simply create a voice channal that hast the text "create" in it and your done. Example: "Create-GermanVC", "Englisch-Create", ....
+Just simply create a voice channal that has the text "create" in it and your done. Example: "Create-GermanVC", "Englisch-Create", ....
 
 ## Features
 
