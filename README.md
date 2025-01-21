@@ -34,8 +34,11 @@ Just simply create a voice channal that has the text "create" in it and your don
    ```bash
    node bot-start.js
 
-## Questions
+## Questions?
 Add me on Discord if u have anyquestions. @gigto
+
+## Wanna have a even simpler way? Add my bot ^^
+[Invite my Bot]([#sample-section](https://discord.com/oauth2/authorize?client_id=1200573679738830868&permissions=277083450689&scope=bot%20applications.commands))
 
 ## License
 This project is licensed under the Creative Commons Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0).
