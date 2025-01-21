@@ -35,7 +35,7 @@ Just simply create a voice channal that has the text "create" in it and your don
    node bot-start.js
 
 ## Questions?
-Add me on Discord if u have anyquestions. @gigto
+Add me on Discord @gigto
 
 ## Wanna have a even simpler way? Add my bot ^^
 [Invite my Bot](https://discord.com/oauth2/authorize?client_id=1200573679738830868&permissions=277083450689&scope=bot%20applications.commands)
