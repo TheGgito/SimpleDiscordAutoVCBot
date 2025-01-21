@@ -29,10 +29,10 @@ Just simply create a voice channal that has the text "create" in it and your don
    npm install
 3. DISCORD_BOT_TOKEN=your-bot-token-here
    
-5. Start the bot.
+4. Start the bot.
    ```bash
    node bot-start.js
-  OR just start the "start-bot.exe" if u are on windows OR on linux "start-bot.sh"
+ 4.1 OR just start the "start-bot.exe" if u are on windows OR on linux "start-bot.sh"
 
 ## Questions
 Add me on Discord if u have anyquestions. @gigto
