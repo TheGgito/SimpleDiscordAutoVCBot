@@ -38,8 +38,8 @@ Just simply create a voice channel that has the text "create" in it and your don
 ## Questions?
 Add me on Discord [@gigto](https://discord.com/users/168467807409930240)
 
-## Wanna have a even simpler way? Add my bot to your server. Totally for free and u get a music function as well ;).
-[Invite my Bot](https://discord.com/oauth2/authorize?client_id=1200573679738830868&permissions=277083450689&scope=bot%20applications.commands)
+## Add my bot for a demo or permanently!
+Wanna have a even simpler way? Add my bot to your server. Totally for free and u get a music function as well ;). [Invite the Bot](https://discord.com/oauth2/authorize?client_id=1200573679738830868&permissions=277083450689&scope=bot%20applications.commands)
 
 ## License
 This project is licensed under the Creative Commons Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0).
