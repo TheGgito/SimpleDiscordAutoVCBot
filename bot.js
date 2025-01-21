@@ -21,7 +21,7 @@ const getTimestamp = () => {
 };
 
 client.once('ready', async () => {
-  console.log(`${getTimestamp()} * [INFO] Bot is ready! Logged in as ${client.user.tag}`);
+  console.log(`${getTimestamp()} * [INFO] Bot is ready! Made by Gigto™ Logged in as ${client.user.tag}`);
 
   client.guilds.cache.forEach(async (Server) => {
     console.log(`${getTimestamp()} * [INFO] Checking Server: ${Server.name} (ID: ${Server.id})`);
