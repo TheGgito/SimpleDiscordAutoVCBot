@@ -3,7 +3,7 @@
 This is a Discord bot designed to easily and fast create temporary voice channals for your discord server.
 
 ## How it works!
-Just simply create a voice channel that has the text "create" in it and your done. Example: "Create-GermanVC", "Englisch-Create", ....
+Just simply create a voice channal that has the text "create" in it and your done. Example: "Create-GermanVC", "Englisch-Create", ....
 
 ## Features
 
@@ -12,7 +12,6 @@ Just simply create a voice channel that has the text "create" in it and your don
 - Monitors and deletes empty "Temp" channels.
 - Provides logging for actions such as user movements and channel creations/deletions.
 - Works with multible create voice channels.
-- Copies the permissions from the corresponding create channel.
 
 ## Requirements
 
@@ -25,21 +24,21 @@ Just simply create a voice channel that has the text "create" in it and your don
    ```bash
    git clone https://github.com/TheGgito/SimpleDiscordAutoVCBot.git
    cd SimpleDiscordAutoVCBot
-2. Install npm:
+2. Install npm
    ```bash 
    npm install
 3. DISCORD_BOT_TOKEN=your-bot-token-here
    
-4. Start the bot:
+4. Start the bot.
 - Just start the `start-bot.exe` if u are on windows OR on linux `start-bot.sh`.
    ```bash
    node bot-start.js
 
 ## Questions?
-Add me on Discord [@gigto](https://discord.com/users/168467807409930240)
+Add me on Discord if u have anyquestions. @gigto
 
-## Add my bot for a demo or permanently!
-Wanna have a even simpler way? Add my bot to your server. Totally for free and u get a music function as well ;). [Invite the Bot](https://discord.com/oauth2/authorize?client_id=1200573679738830868&permissions=277083450689&scope=bot%20applications.commands)
+## Wanna have a even simpler way? Add my bot ^^
+[Invite my Bot](https://discord.com/oauth2/authorize?client_id=1200573679738830868&permissions=277083450689&scope=bot%20applications.commands)
 
 ## License
 This project is licensed under the Creative Commons Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0).

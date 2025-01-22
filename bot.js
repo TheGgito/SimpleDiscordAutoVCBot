@@ -8,7 +8,6 @@ const client = new Client({
   ],
 });
 
-// Funktion, die den Zeitstempel im gewünschten Format zurückgibt
 const getTimestamp = () => {
   const now = new Date();
   const day = String(now.getDate()).padStart(2, '0');
@@ -26,7 +25,6 @@ client.once('ready', async () => {
   client.guilds.cache.forEach(async (Server) => {
     console.log(`${getTimestamp()} * [INFO] Checking Server: ${Server.name} (ID: ${Server.id})`);
 
-    // Überprüfen und überwachen bestehender "Create"-Kanäle
     const createChannels = Server.channels.cache.filter(
       (channel) => channel.type === ChannelType.GuildVoice && channel.name.toLowerCase().includes('create')
     );
@@ -36,36 +34,53 @@ client.once('ready', async () => {
 
       createChannel.members.forEach(async (member) => {
         if (!member.voice.channel || !member.voice.channel.name.toLowerCase().includes('temp')) {
-          const tempChannel = await createTempChannel(createChannel, member, Server);
-          if (member.voice.channel) {
-            await member.voice.setChannel(tempChannel).catch((error) => {
-              console.error(`${getTimestamp()} ! [ERROR] Error while moving member to Temp channel | ${Server.name}:`, error);
-            });
-            console.log(`${getTimestamp()} ~ [MOVE] ${member.user.tag} was moved to the "Temp" channel from "${createChannel.name}" | ${Server.name}`);
+          try {
+            const tempChannel = await createTempChannel(createChannel, member, Server);
+            if (member.voice.channel) {
+              await member.voice.setChannel(tempChannel).catch((error) => {
+                if (error.code === 50013) {
+                  console.error(`${getTimestamp()} ! [ERROR] Missing permissions to move member | ${Server.name}:`, error);
+                } else {
+                  throw error;
+                }
+              });
+              console.log(`${getTimestamp()} ~ [MOVE] ${member.user.tag} was moved to the "Temp" channel from "${createChannel.name}" | ${Server.name}`);
+            }
+            monitorTempChannel(tempChannel, Server);
+          } catch (error) {
+            console.error(`${getTimestamp()} ! [ERROR] Failed to create Temp channel or move member | ${Server.name}:`, error);
           }
-
-          monitorTempChannel(tempChannel, Server);
         }
       });
     });
 
-    // Überprüfen und überwachen bestehender "Temp"-Kanäle
     const tempChannels = Server.channels.cache.filter(
       (channel) => channel.type === ChannelType.GuildVoice && channel.name === 'Temp'
     );
 
     tempChannels.forEach(async (tempChannel) => {
-      const fetchedChannel = await tempChannel.fetch().catch(console.error);
-      if (fetchedChannel) {
+      try {
+        const fetchedChannel = await tempChannel.fetch().catch(() => null);
+
+        if (!fetchedChannel) return;
+
         console.log(`${getTimestamp()} * [INFO] Checking "Temp" channel | ${Server.name}`);
         console.log(`${getTimestamp()} * [INFO] Members in Temp channel: ${fetchedChannel.members.size} | ${Server.name}`);
 
         if (fetchedChannel.members.size === 0) {
-          await fetchedChannel.delete().catch(console.error);
+          await fetchedChannel.delete().catch((error) => {
+            if (error.code === 50013) {
+              console.error(`${getTimestamp()} ! [ERROR] Missing permissions to delete Temp channel | ${Server.name}:`, error);
+            } else {
+              throw error;
+            }
+          });
           console.log(`${getTimestamp()} - [DELETE] Deleted empty Temp channel: ${tempChannel.id} | ${Server.name}`);
         } else {
           monitorTempChannel(fetchedChannel, Server);
         }
+      } catch (error) {
+        console.error(`${getTimestamp()} ! [ERROR] Failed to check or delete Temp channel | ${Server.name}:`, error);
       }
     });
   });
@@ -83,15 +98,22 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
         newState.member.voice.channel &&
         !newState.member.voice.channel.name.toLowerCase().includes('temp')
       ) {
-        const tempChannel = await createTempChannel(createChannel, newState.member, Server);
-        if (newState.member.voice.channel) {
-          await newState.member.voice.setChannel(tempChannel).catch((error) => {
-            console.error(`${getTimestamp()} ! [ERROR] Error while moving member to Temp channel | ${Server.name}:`, error);
-          });
-          console.log(`${getTimestamp()} ~ [MOVE] ${newState.member.user.tag} was moved to the "Temp" channel from "${createChannel.name}" | ${Server.name}`);
+        try {
+          const tempChannel = await createTempChannel(createChannel, newState.member, Server);
+          if (newState.member.voice.channel) {
+            await newState.member.voice.setChannel(tempChannel).catch((error) => {
+              if (error.code === 50013) {
+                console.error(`${getTimestamp()} ! [ERROR] Missing permissions to move member | ${Server.name}:`, error);
+              } else {
+                throw error;
+              }
+            });
+            console.log(`${getTimestamp()} ~ [MOVE] ${newState.member.user.tag} was moved to the "Temp" channel from "${createChannel.name}" | ${Server.name}`);
+          }
+          monitorTempChannel(tempChannel, Server);
+        } catch (error) {
+          console.error(`${getTimestamp()} ! [ERROR] Failed to create Temp channel or move member | ${Server.name}:`, error);
         }
-
-        monitorTempChannel(tempChannel, Server);
       }
     }
   } catch (error) {
@@ -100,49 +122,49 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
 });
 
 const createTempChannel = async (createChannel, member, Server) => {
-  console.log(`${getTimestamp()} + [CREATE] Creating Temp channel for member ${member.user.tag} in ${createChannel.name} | ${Server.name}`);
-  const tempChannel = await Server.channels.create({
-    name: 'Temp',
-    type: ChannelType.GuildVoice,
-    parent: createChannel.parent,
-  });
+  try {
+    console.log(`${getTimestamp()} + [CREATE] Creating Temp channel for member ${member.user.tag} in ${createChannel.name} | ${Server.name}`);
+    const tempChannel = await Server.channels.create({
+      name: 'Temp',
+      type: ChannelType.GuildVoice,
+      parent: createChannel.parent,
+    });
 
-  const permissions = createChannel.permissionOverwrites.cache.map((overwrite) => ({
-    id: overwrite.id,
-    allow: overwrite.allow.bitfield,
-    deny: overwrite.deny.bitfield,
-  }));
+    const permissions = createChannel.permissionOverwrites.cache.map((overwrite) => ({
+      id: overwrite.id,
+      allow: overwrite.allow.bitfield,
+      deny: overwrite.deny.bitfield,
+    }));
 
-  await tempChannel.permissionOverwrites.set(permissions);
-  await tempChannel.setPosition(createChannel.position + 1);
+    await tempChannel.permissionOverwrites.set(permissions);
+    await tempChannel.setPosition(createChannel.position + 1);
 
-  return tempChannel;
+    return tempChannel;
+  } catch (error) {
+    console.error(`${getTimestamp()} ! [ERROR] Failed to create Temp channel:`, error);
+    throw error;
+  }
 };
 
 const monitorTempChannel = (tempChannel, Server) => {
-  const checkChannelEmpty = async () => {
+  client.on('voiceStateUpdate', async (oldState, newState) => {
     try {
-      const channel = await tempChannel.fetch().catch(console.error);
-      if (channel) {
-        console.log(`${getTimestamp()} * [INFO] Checking Temp channel: ${channel.name} | ${Server.name}`);
-        console.log(`${getTimestamp()} * [INFO] Members in Temp channel: ${channel.members.size}`);
-        
-        if (channel.members.size === 0) {
-          await channel.delete().catch(console.error);
-          console.log(`${getTimestamp()} - [DELETE] Deleted empty Temp channel: ${tempChannel.id} | ${Server.name}`);
-        }
+      const fetchedChannel = await tempChannel.fetch().catch(() => null);
+
+      if (!fetchedChannel) return;
+
+      if (fetchedChannel.members.size === 0) {
+        await fetchedChannel.delete().catch((error) => {
+          if (error.code === 50013) {
+            console.error(`${getTimestamp()} ! [ERROR] Missing permissions to delete Temp channel:`, error);
+          } else {
+            throw error;
+          }
+        });
+        console.log(`${getTimestamp()} - [DELETE] Deleted empty Temp channel: ${tempChannel.id} | ${Server.name}`);
       }
     } catch (error) {
-      console.error(`${getTimestamp()} ! [ERROR] Error while checking and deleting temp channel | ${Server.name}:`, error);
-    }
-  };
-
-  client.on('voiceStateUpdate', (oldState, newState) => {
-    if (oldState.channelId === tempChannel.id || newState.channelId === tempChannel.id) {
-      checkChannelEmpty();
-      if (newState.channelId === null) {
-        console.log(`${getTimestamp()} * [INFO] ${newState.member.user.tag} left the "Temp" channel | ${Server.name}`);
-      }
+      console.error(`${getTimestamp()} ! [ERROR] Failed to monitor or delete Temp channel:`, error);
     }
   });
 };
