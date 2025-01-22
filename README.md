@@ -1,4 +1,4 @@
-# Simple Discord Auto VC Bot
+# Simple Discord Auto VoiceChat-Bot
 
 This is a Discord bot designed to easily and fast create temporary voice channals for your discord server.
 
