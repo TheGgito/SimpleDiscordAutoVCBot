@@ -23,13 +23,15 @@ Just simply create a voice channal that has the text "create" in it and your don
 1. Clone this repository to your local machine:
    ```bash
    git clone https://github.com/TheGgito/SimpleDiscordAutoVCBot.git
+2.
+   ```bash
    cd SimpleDiscordAutoVCBot
-2. Install npm
+3. Install npm
    ```bash 
    npm install
-3. DISCORD_BOT_TOKEN=your-bot-token-here
+4. DISCORD_BOT_TOKEN=your-bot-token-here
    
-4. Start the bot.
+5. Start the bot.
 - Just start the `start-bot.exe` if u are on windows OR on linux `start-bot.sh`.
    ```bash
    node bot-start.js
