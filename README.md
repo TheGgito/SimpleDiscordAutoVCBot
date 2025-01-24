@@ -29,7 +29,7 @@ Just simply create a voice channal that has the text "create" in it and your don
 3. Install npm
    ```bash 
    npm install
-4. DISCORD_BOT_TOKEN=your-bot-token-here
+4.  Put your bot token in token.env 'DISCORD_BOT_TOKEN=your-bot-token-here'
    
 5. Start the bot.
 - Just start the `start-bot.exe` if u are on windows OR on linux `start-bot.sh`.
