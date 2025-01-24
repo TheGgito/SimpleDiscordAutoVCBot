@@ -12,6 +12,7 @@ Just simply create a voice channal that has the text "create" in it and your don
 - Monitors and deletes empty "Temp" channels.
 - Provides logging for actions such as user movements and channel creations/deletions.
 - Works with multible create voice channels.
+- Copy the permissions from the corresponding "create" channel.
 
 ## Requirements
 
