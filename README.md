@@ -26,7 +26,7 @@ Just simply create a voice channal that has the text "create" in it and your don
    git clone https://github.com/TheGgito/SimpleDiscordAutoVCBot.git
 2.
    ```bash
-   cd SimpleDiscordAutoVCBot
+   cd CleverAutomatedTemporaryOrganizer-CATO
 3. Install npm
    ```bash 
    npm install
