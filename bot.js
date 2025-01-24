@@ -1,5 +1,6 @@
 const { Client, GatewayIntentBits, ChannelType } = require('discord.js');
 require('dotenv').config({ path: './token.env' });
+const dns = require('dns');
 
 const client = new Client({
   intents: [
@@ -19,18 +20,79 @@ const getTimestamp = () => {
   return `[${day}-${month}-${year}/${hours}:${minutes}:${seconds}]`;
 };
 
+const checkInternet = async () => {
+  return new Promise((resolve) => {
+    dns.lookup('google.com', (err) => {
+      if (err && err.code === 'ENOTFOUND') {
+        resolve(false);
+      } else {
+        resolve(true);
+      }
+    });
+  });
+};
+
+const startBot = async () => {
+  console.log(`${getTimestamp()} * [INFO] Checking internet connection...`);
+  const hasInternet = await checkInternet();
+
+  if (hasInternet) {
+    console.log(`${getTimestamp()} * [INFO] Internet connection available. Starting bot...`);
+    client.login(process.env.DISCORD_BOT_TOKEN).catch((error) => {
+      console.error(`${getTimestamp()} ! [ERROR] Failed to login:`, error);
+      process.exit(1);
+    });
+  } else {
+    console.log(`${getTimestamp()} * [WARN] No internet connection. Retrying in 5 seconds...`);
+    setTimeout(startBot, 5000);
+  }
+};
+
 client.once('ready', async () => {
-  console.log(`${getTimestamp()} * [INFO] Bot is ready! Made by Gigto™ Logged in as ${client.user.tag}`);
+  console.log(`${getTimestamp()} * [INFO] Bot is ready! Made by Gigto™ <Logged in as ${client.user.tag}>`);
 
   client.guilds.cache.forEach(async (Server) => {
     console.log(`${getTimestamp()} * [INFO] Checking Server: ${Server.name} (ID: ${Server.id})`);
+
+    const tempChannels = Server.channels.cache.filter(
+      (channel) => channel.type === ChannelType.GuildVoice && channel.name === 'Temp'
+    );
+
+    tempChannels.forEach(async (tempChannel) => {
+      console.log(
+        `${getTimestamp()} * [FOUND] Temp channel(s) on Server: ${Server.name}`
+      );
+
+      try {
+        const fetchedChannel = await tempChannel.fetch().catch(() => null);
+        if (!fetchedChannel) return;
+
+        if (fetchedChannel.members.size === 0) {
+          await fetchedChannel.delete().catch((error) => {
+            if (error.code === 50013) {
+              console.error(`${getTimestamp()} ! [ERROR] Missing permissions to delete Temp channel | ${Server.name}:`, error);
+            } else {
+              throw error;
+            }
+          });
+          console.log(`${getTimestamp()} - [DELETE] Deleted empty Temp channel | ${Server.name}`);
+        } else {
+          console.log(
+            `${getTimestamp()} * [INFO] Found ${fetchedChannel.members.size} members in Temp channel | ${Server.name}`
+          );
+          monitorTempChannel(fetchedChannel, Server);
+        }
+      } catch (error) {
+        console.error(`${getTimestamp()} ! [ERROR] Failed to process Temp channel "${tempChannel.name}" | ${Server.name}:`, error);
+      }
+    });
 
     const createChannels = Server.channels.cache.filter(
       (channel) => channel.type === ChannelType.GuildVoice && channel.name.toLowerCase().includes('create')
     );
 
     createChannels.forEach(async (createChannel) => {
-      console.log(`${getTimestamp()} * [INFO] Checking "Create" channel: ${createChannel.name} (Server: ${Server.name})`);
+      console.log(`${getTimestamp()} * [FOUND] Create channel "${createChannel.name}" | ${Server.name}`);
 
       createChannel.members.forEach(async (member) => {
         if (!member.voice.channel || !member.voice.channel.name.toLowerCase().includes('temp')) {
@@ -53,36 +115,6 @@ client.once('ready', async () => {
         }
       });
     });
-
-    const tempChannels = Server.channels.cache.filter(
-      (channel) => channel.type === ChannelType.GuildVoice && channel.name === 'Temp'
-    );
-
-    tempChannels.forEach(async (tempChannel) => {
-      try {
-        const fetchedChannel = await tempChannel.fetch().catch(() => null);
-
-        if (!fetchedChannel) return;
-
-        console.log(`${getTimestamp()} * [INFO] Checking "Temp" channel | ${Server.name}`);
-        console.log(`${getTimestamp()} * [INFO] Members in Temp channel: ${fetchedChannel.members.size} | ${Server.name}`);
-
-        if (fetchedChannel.members.size === 0) {
-          await fetchedChannel.delete().catch((error) => {
-            if (error.code === 50013) {
-              console.error(`${getTimestamp()} ! [ERROR] Missing permissions to delete Temp channel | ${Server.name}:`, error);
-            } else {
-              throw error;
-            }
-          });
-          console.log(`${getTimestamp()} - [DELETE] Deleted empty Temp channel: ${tempChannel.id} | ${Server.name}`);
-        } else {
-          monitorTempChannel(fetchedChannel, Server);
-        }
-      } catch (error) {
-        console.error(`${getTimestamp()} ! [ERROR] Failed to check or delete Temp channel | ${Server.name}:`, error);
-      }
-    });
   });
 });
 
@@ -92,7 +124,7 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
     const Server = newState.guild;
 
     if (createChannel && createChannel.name.toLowerCase().includes('create')) {
-      console.log(`${getTimestamp()} * [INFO] User ${newState.member.user.tag} joined "Create" channel | ${Server.name}`);
+      console.log(`${getTimestamp()} * [INFO] User ${newState.member.user.tag} joined "${createChannel.name}" channel | ${Server.name}`);
 
       if (
         newState.member.voice.channel &&
@@ -141,7 +173,7 @@ const createTempChannel = async (createChannel, member, Server) => {
 
     return tempChannel;
   } catch (error) {
-    console.error(`${getTimestamp()} ! [ERROR] Failed to create Temp channel:`, error);
+    console.error(`${getTimestamp()} ! [ERROR] Failed to create Temp channel | ${Server.name}`, error);
     throw error;
   }
 };
@@ -156,7 +188,7 @@ const monitorTempChannel = (tempChannel, Server) => {
       if (fetchedChannel.members.size === 0) {
         await fetchedChannel.delete().catch((error) => {
           if (error.code === 50013) {
-            console.error(`${getTimestamp()} ! [ERROR] Missing permissions to delete Temp channel:`, error);
+            console.error(`${getTimestamp()} ! [ERROR] Missing permissions to delete Temp channel | ${Server.name}`, error);
           } else {
             throw error;
           }
@@ -164,10 +196,9 @@ const monitorTempChannel = (tempChannel, Server) => {
         console.log(`${getTimestamp()} - [DELETE] Deleted empty Temp channel: ${tempChannel.id} | ${Server.name}`);
       }
     } catch (error) {
-      console.error(`${getTimestamp()} ! [ERROR] Failed to monitor or delete Temp channel:`, error);
+      console.error(`${getTimestamp()} ! [ERROR] Failed to monitor or delete Temp channel | ${Server.name}`, error);
     }
   });
 };
 
-client.login(process.env.DISCORD_BOT_TOKEN);
-
+startBot();
